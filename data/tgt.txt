@@ -1,0 +1,3 @@
+Hello World!
+Pythag = 8.6
+Ackley = 10.3
