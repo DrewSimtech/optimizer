@@ -1,6 +1,6 @@
 
-# Global imports
-import shutil
+# Local package imports
+from debug import Debug
 
 
 class RootWalker(object):
@@ -36,24 +36,22 @@ class RootWalker(object):
     def _determineSteps(self, costs):
         assert not hasattr(super(), '_determineSteps')
         self._flattest_curve = self._findSmallestCost(costs)
-        print(self._flattest_curve)
+        Debug.log('flattest curve: ' + str(self._flattest_curve))
         # trim info not at the step of closest fit.
         dir_k_next = self._launcher.getDirNameFromRunName(
             self._flattest_curve[0])
-        print(dir_k_next)
+        Debug.log('dir_k_next: ' + str(dir_k_next))
+        # Archive the data from the cheapest run,
+        # so we have a log of the path we took.
+        self._launcher.archiveDir(dir_k_next)
         for c in costs.keys():
             if (dir_k_next not in c):
-                # rmtree is dangerous cause it will remove the folder and
-                # all of its contents. So be careful with what we remove.
-                # Don't want to accedently clean an entire folder of code.
-                shutil.rmtree(c)
-                # Then clean the key from our dictionary.
+                # Clean the expensive keys from our dictionary.
                 del costs[c]
-        # TODO: archive the data from the cheapest run,
-        # so we have a log of th path we took.
         self._updateGradients(costs)
         # TODO: generate BFGS matrix
         # TODO: generate step sizes
+        # TODO: call our launcher's data cleaning method
 
     def _findSmallestCost(self, costs):
         assert not hasattr(super(), '_findSmallestCost')
@@ -71,12 +69,12 @@ class RootWalker(object):
             # get set of unique runs per variable name.
             xi_gradient_runs = \
                 {x for x in costs.keys() if m.name.lower() in x.lower()}
-            print(xi_gradient_runs)
+            Debug.log('Gradient Runs: ' + str(xi_gradient_runs))
             # get the plus and minus run
             xi_plus = {x for x in xi_gradient_runs if 'plus' in x.lower()}[0]
             xi_minus = {x for x in xi_gradient_runs if 'minus' in x.lower()}[0]
-            print(xi_plus)
-            print(xi_minus)
+            Debug.log('plus:  ' + str(xi_plus))
+            Debug.log('minus: ' + str(xi_minus))
 
     #############################################
     # CREATING DATA                             #
@@ -111,4 +109,4 @@ class RootWalker(object):
             self._launchSet()
             costs = self._calculateCosts()
             self._determineSteps(costs)
-        print('Flattest Curve Found: ' + str(self._flattest_curve))
+        Debug.log('Flattest Curve Found: ' + str(self._flattest_curve))

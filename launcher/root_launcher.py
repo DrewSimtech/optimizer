@@ -2,6 +2,8 @@
 # global package imports
 import os
 import shutil
+# local package imports
+from debug import Debug
 
 
 # Class definition
@@ -12,6 +14,7 @@ class RootLauncher(object):
     card_name_layout += '{0._base_file_trimmed}_{gradient}.CRD'
     run_name_in_dir = '{run_dir}/{this._base_file_trimmed}_{gradient}.CRD'
     mutable_data_layout = '{name} = {value}\n'
+    cur_iter_archive = '{0._data_dir}/step_map/iteration_{0._iterations}'
 
     #############################################
     # INITIALIZATION                            #
@@ -23,6 +26,7 @@ class RootLauncher(object):
         self._card_base_path = os.path.join(self._data_dir, self._base_file)
         self._num_steps = 10
         self._run_number = 0
+        self._iterations = 0
         self._cards_to_launch = []
         super().__init__(**kwargs)
 
@@ -41,8 +45,31 @@ class RootLauncher(object):
             gradient += str(slope)
         run_name = self.run_name_in_dir.format(
             run_dir=run_dir, this=self, gradient=gradient)
-        print(run_name)
+        Debug.log(run_name)
         return run_name
+
+    def getStepFromRunName(self, run_name):
+        assert not hasattr(super(), 'getStepFromRunName')
+        for item in run_name.split('/'):
+            if('step' in item):
+                step = int(item.strip('step'))
+                return step
+
+    def archiveDir(self, dir_name):
+        assert not hasattr(super(), 'archiveDir')
+        shutil.move(dir_name, self.cur_iter_archive.format(self))
+
+    def clearRunData(self):
+        assert not hasattr(super(), 'clearRunData')
+        # rmtree is dangerous cause it will remove the folder and
+        # all of its contents. So be careful with what we remove.
+        # Don't want to accedently clean an entire folder of code.
+        for run in self._cards_to_launch:
+            # check for data before we attempt delete.
+            if (os.access(run, os.R_OK)):
+                del_dir = self.getDirNameFromRunName(run)
+                Debug.log('del: ' + str(del_dir))
+                shutil.rmtree(del_dir)
 
     #############################################
     # CREATE RUN DATA                           #
