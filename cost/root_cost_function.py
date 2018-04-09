@@ -1,4 +1,8 @@
 
+# Local package imports
+from debug import rootClassMethod
+
+
 class RootCostFunction(object):
     '''Information for ranking.'''
 
@@ -14,19 +18,16 @@ class RootCostFunction(object):
         # pass on init
         super().__init__(**kwargs)
 
+    @rootClassMethod
     def setTargetFile(self, tgt_run):
-        # Defensive programming
-        assert not hasattr(super(), 'setDataFiles')
         self._tgt_run = tgt_run
 
     #############################################
     # COST FUNCTION                             #
     #############################################
+    @rootClassMethod
     def calculate(self, cur_run_file):
         '''determine the value of each run'''
-        # Defensive programming. Make sure we're the last
-        # super()._calculate call. We dont want attribute errors.
-        assert not hasattr(super(), '_calculate')
         # Apply the weight to the cost function
         self._cost *= self.__weight
         return self._cost
@@ -34,5 +35,6 @@ class RootCostFunction(object):
     #############################################
     # DATA RETRIEVAL                            #
     #############################################
+    @rootClassMethod
     def _getData(self, from_file):
-        assert not hasattr(super(), '_getData')
+        pass

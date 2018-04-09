@@ -1,6 +1,6 @@
 
 # Local package imports
-from debug import Debug
+from debug import Debug, rootClassMethod
 
 
 class RootWalker(object):
@@ -18,23 +18,23 @@ class RootWalker(object):
         self._itterations = 0
         super().__init__(**kwargs)
 
+    @rootClassMethod
     def setMutables(self, mutables):
-        assert not hasattr(super(), '_setMutables')
         self._mutables = mutables
 
+    @rootClassMethod
     def setCostFuncs(self, cost_funcs):
-        assert not hasattr(super(), '_setCostFuncs')
         self._cost_funcs = cost_funcs
 
+    @rootClassMethod
     def setLauncher(self, launcher):
-        assert not hasattr(super(), '_setLauncher')
         self._launcher = launcher
 
     #############################################
     # CALCULATE STEP SIZING                     #
     #############################################
+    @rootClassMethod
     def _determineSteps(self, costs):
-        assert not hasattr(super(), '_determineSteps')
         self._flattest_curve = self._findSmallestCost(costs)
         Debug.log('flattest curve: ' + str(self._flattest_curve))
         # trim info not at the step of closest fit.
@@ -53,8 +53,8 @@ class RootWalker(object):
         # TODO: generate step sizes
         # TODO: call our launcher's data cleaning method
 
+    @rootClassMethod
     def _findSmallestCost(self, costs):
-        assert not hasattr(super(), '_findSmallestCost')
         smallest_cost = ('None', float('-inf'))
         for c in costs.items():
             # don't need to check against gradient runs
@@ -62,8 +62,8 @@ class RootWalker(object):
                 smallest_cost = c
         return smallest_cost
 
+    @rootClassMethod
     def _updateGradients(self, costs):
-        assert not hasattr(super(), '_updateGradients')
         # TODO: this function.
         for m in self._mutables:
             # get set of unique runs per variable name.
@@ -75,20 +75,29 @@ class RootWalker(object):
             xi_minus = {x for x in xi_gradient_runs if 'minus' in x.lower()}[0]
             Debug.log('plus:  ' + str(xi_plus))
             Debug.log('minus: ' + str(xi_minus))
+            # get offsets widths for calculating gradients
+            step = self._launcher.getStepFromRunName(xi_plus)
+            gradient_width = m.getGradientWidthAtStep(step)
+            # Gradient per variable:
+            #           F(x[i] + s[i]) - F(x[i] - s[i])
+            # g(x[i]) = -------------------------------
+            #                        2s[i]
+            gradient = (costs[xi_plus] - costs[xi_minus])
+            gradient /= (2.0 * gradient_width)
 
     #############################################
     # CREATING DATA                             #
     #############################################
+    @rootClassMethod
     def _launchSet(self, num_runs=10):
-        assert not hasattr(super(), '_launchSet')
         self._launcher.createRuns(self._mutables, num_runs)
         self._launcher.launch()
 
     #############################################
     # CALCULATING DIFFERENCE                    #
     #############################################
+    @rootClassMethod
     def _calculateCosts(self):
-        assert not hasattr(super(), '_calculateCosts')
         cost_sums = {}
         # for each run add up the costs
         for run in self._launcher.getLatestRunset():
@@ -102,8 +111,8 @@ class RootWalker(object):
     # WALKER ENTRY POINT                        #
     #############################################
     # This method name wasn't meant to be a joke.
+    @rootClassMethod
     def run(self, epsilon=1.0):
-        assert not hasattr(super(), 'run')
         # Main loop after first pass. Loop till acceptable convergance
         while(self._flattest_curve[1] > epsilon):
             self._launchSet()

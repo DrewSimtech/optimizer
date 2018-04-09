@@ -2,6 +2,11 @@
 import sys
 
 
+def rootClassMethod(func):
+    assert not hasattr(super(), func.__name__)
+    return func
+
+
 class Debug:
     out = sys.stdout
     err = sys.stderr

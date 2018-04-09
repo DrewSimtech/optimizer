@@ -3,7 +3,7 @@
 import os
 import shutil
 # local package imports
-from debug import Debug
+from debug import Debug, rootClassMethod
 
 
 # Class definition
@@ -33,13 +33,13 @@ class RootLauncher(object):
     #############################################
     # UTILITY FUNCTIONS                         #
     #############################################
+    @rootClassMethod
     def getDirNameFromRunName(self, run_name):
-        assert not hasattr(super(), 'getDirNameFromRunName')
         dir_name = run_name.rpartition('/')[0]
         return dir_name
 
+    @rootClassMethod
     def getRunNameInDirForMutable(self, run_dir, mutable, slope=''):
-        assert not hasattr(super(), 'getRunNameInDirForMutable')
         gradient = str(mutable.name)
         if(slope):
             gradient += str(slope)
@@ -48,19 +48,26 @@ class RootLauncher(object):
         Debug.log(run_name)
         return run_name
 
+    @rootClassMethod
     def getStepFromRunName(self, run_name):
-        assert not hasattr(super(), 'getStepFromRunName')
         for item in run_name.split('/'):
             if('step' in item):
                 step = int(item.strip('step'))
                 return step
 
+    @rootClassMethod
     def archiveDir(self, dir_name):
-        assert not hasattr(super(), 'archiveDir')
         shutil.move(dir_name, self.cur_iter_archive.format(self))
 
-    def clearRunData(self):
-        assert not hasattr(super(), 'clearRunData')
+    @rootClassMethod
+    def getLatestRunset(self):
+        return self._cards_to_launch
+
+    #############################################
+    # CREATE RUN DATA                           #
+    #############################################
+    @rootClassMethod
+    def _clearRunData(self):
         # rmtree is dangerous cause it will remove the folder and
         # all of its contents. So be careful with what we remove.
         # Don't want to accedently clean an entire folder of code.
@@ -71,17 +78,10 @@ class RootLauncher(object):
                 Debug.log('del: ' + str(del_dir))
                 shutil.rmtree(del_dir)
 
-    #############################################
-    # CREATE RUN DATA                           #
-    #############################################
-    def getLatestRunset(self):
-        assert not hasattr(super(), 'getLatestRunset')
-        return self._cards_to_launch
-
+    @rootClassMethod
     def createRuns(self, mutables, num_runs=10):
-        assert not hasattr(super(), 'createRuns')
-        # clear launch set before building the next one
-        self._cards_to_launch = []
+        # clear launch set before building the next ones
+        self.clearRunData()
         for i in range(num_runs):
             self._run_number += 1
             self._populateCard(i, mutables, None, 'all', 0.0)
@@ -89,6 +89,7 @@ class RootLauncher(object):
                 self._populateCard(i, mutables, m, m.name + '_plus', 1.0)
                 self._populateCard(i, mutables, m, m.name + '_minus', -1.0)
 
+    @rootClassMethod
     def _populateCard(self, step, mutables, cur_mutable, gradient, slope):
         # Set up a new card name
         card_path = self._getCardPath(gradient)
@@ -100,8 +101,8 @@ class RootLauncher(object):
         # Add it to our launch list
         self._cards_to_launch.append(card_path)
 
+    @rootClassMethod
     def _getCardPath(self, gradient):
-        assert not hasattr(super(), '_getCardPath')
         card_path = self.card_name_layout.format(self, gradient=gradient)
         # Make the folder if it doesn't exist.
         card_dir = card_path.rpartition('/')[0]
@@ -110,9 +111,9 @@ class RootLauncher(object):
         # Return the name
         return card_path
 
+    @rootClassMethod
     def _writeMutablesToCard(self, card_path, step, mutables,
                              cur_mutable=None, slope=0.0):
-        assert not hasattr(super(), '_writeMutablesToCard')
         # Calculate the gradient. by default it's 0 and
         # doesnt change the input.
         gradient_width = 0.0
@@ -136,6 +137,8 @@ class RootLauncher(object):
     #############################################
     # LAUNCH RUNS                               #
     #############################################
+    @rootClassMethod
     def launch(self):
-        assert not hasattr(super(), 'launch')
         # implement in child classes
+        pass
+
