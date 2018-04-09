@@ -53,54 +53,35 @@ class RootLauncher(object):
 
     def createRuns(self, mutables, num_runs=10):
         assert not hasattr(super(), 'createRuns')
-        self._card_files = []
+        # clear launch set before building the next one
+        self._cards_to_launch = []
         for i in range(num_runs):
             self._run_number += 1
-            self._writeStepCard(i, mutables)
+            self._populateCard(i, mutables, None, 'all', 0.0)
             for m in mutables:
-                self._writeGradientCard(i, mutables, m)
+                self._populateCard(i, mutables, m, m.name + '_plus', 1.0)
+                self._populateCard(i, mutables, m, m.name + '_minus', -1.0)
+
+    def _populateCard(self, step, mutables, cur_mutable, gradient, slope):
+        # Set up a new card name
+        card_path = self._getCardPath(gradient)
+        # Copy the base information into it
+        shutil.copyfile(self._card_base_path, card_path)
+        # Write the changed information into it
+        self._writeMutablesToCard(
+            card_path, step, mutables, cur_mutable, slope)
+        # Add it to our launch list
+        self._cards_to_launch.append(card_path)
 
     def _getCardPath(self, gradient):
         assert not hasattr(super(), '_getCardPath')
         card_path = self.card_name_layout.format(self, gradient=gradient)
-
         # Make the folder if it doesn't exist.
         card_dir = card_path.rpartition('/')[0]
         if(not os.access(card_dir, os.R_OK)):
             os.makedirs(card_dir)
         # Return the name
         return card_path
-
-    def _writeStepCard(self, step, mutables):
-        assert not hasattr(super(), '_writeStepCard')
-        # Set up a new card name
-        card_path = self._getCardPath('all')
-        # Copy the base information into it
-        shutil.copyfile(self._card_base_path, card_path)
-        # Write the changed information into it
-        self._writeMutablesToCard(
-            card_path, step, mutables, None, 0.0)
-        # Add it to our launch list
-        self._cards_to_launch.append(card_path)
-
-    def _writeGradientCard(self, step, mutables, cur_mutable):
-        assert not hasattr(super(), '_writeGradientCard')
-        # Create and write out a card with a positive gradient.
-        plus_card_path = self._getCardPath(cur_mutable.name + "_plus")
-        shutil.copyfile(self._card_base_path, plus_card_path)
-        self._writeMutablesToCard(
-            plus_card_path, step, mutables, cur_mutable, 1.0)
-        # Add it to our launch list
-        self._cards_to_launch.append(plus_card_path)
-
-        # Create and write out a card with a negative gradient.
-        # these two gradients combined will combine to get the slope
-        minus_card_path = self._getCardPath(cur_mutable.name + "_minus")
-        shutil.copyfile(self._card_base_path, minus_card_path)
-        self._writeMutablesToCard(
-            minus_card_path, step, mutables, cur_mutable, -1.0)
-        # Add it to our launch list
-        self._cards_to_launch.append(minus_card_path)
 
     def _writeMutablesToCard(self, card_path, step, mutables,
                              cur_mutable=None, slope=0.0):
@@ -130,3 +111,4 @@ class RootLauncher(object):
     #############################################
     def launch(self):
         assert not hasattr(super(), 'launch')
+        # implement in child classes

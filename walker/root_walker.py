@@ -1,4 +1,7 @@
 
+# Global imports
+import shutil
+
 
 class RootWalker(object):
     '''Interface for the walker class.
@@ -12,6 +15,7 @@ class RootWalker(object):
         self.setCostFuncs(cost_funcs)
         self.setLauncher(launcher)
         self._flattest_curve = ('None', float('inf'))
+        self._itterations = 0
         super().__init__(**kwargs)
 
     def setMutables(self, mutables):
@@ -34,11 +38,16 @@ class RootWalker(object):
         self._flattest_curve = self._findSmallestCost(costs)
         print(self._flattest_curve)
         # trim info not at the step of closest fit.
-        dir_k_next = self._flattest_curve[0].rpartition('/')[0]
+        dir_k_next = self._launcher.getDirNameFromRunName(
+            self._flattest_curve[0])
         print(dir_k_next)
         for c in costs.keys():
             if (dir_k_next not in c):
-                # TODO: clean directories containing expensive runs
+                # rmtree is dangerous cause it will remove the folder and
+                # all of its contents. So be careful with what we remove.
+                # Don't want to accedently clean an entire folder of code.
+                shutil.rmtree(c)
+                # Then clean the key from our dictionary.
                 del costs[c]
         # TODO: archive the data from the cheapest run,
         # so we have a log of th path we took.
