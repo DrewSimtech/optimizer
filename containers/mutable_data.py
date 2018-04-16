@@ -28,7 +28,7 @@ class MutableVar(object):
         assert not hasattr(super(), 'getValueAtStep')
         return self._cur_value + self._cur_step_width * resolution * at_step
 
-    def getGradientWidthAtStep(self, at_step=0):
+    def getGradientWidthAtStep(self, at_step=0, resolution=0.1):
         assert not hasattr(super(), 'getGradientWidthAtStep')
         #            F(x[i] + s[i]) - F(x[i] - s[i])
         # g(x[i]) = ---------------------------------
@@ -36,7 +36,7 @@ class MutableVar(object):
         #
         # such that s[i] = (10^-4) * |x[i]|
         # return s[i]
-        return (10.0**-4.0) * self.getValueAtStep(at_step)
+        return (10.0**-4.0) * self.getValueAtStep(at_step, resolution)
 
     #############################################
     # BUILT-INS                                 #

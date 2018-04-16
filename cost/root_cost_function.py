@@ -1,6 +1,6 @@
 
 # Local package imports
-from debug import rootClassMethod
+from debug import Debug, rootClassMethod
 
 
 class RootCostFunction(object):
@@ -18,23 +18,36 @@ class RootCostFunction(object):
         # pass on init
         super().__init__(**kwargs)
 
-    @rootClassMethod
+    @rootClassMethod('cost.root_cost_function', 'RootCostFunction')
     def setTargetFile(self, tgt_run):
+        Debug.log(tgt_run)
         self._tgt_run = tgt_run
 
     #############################################
     # COST FUNCTION                             #
     #############################################
-    @rootClassMethod
+    @rootClassMethod('cost.root_cost_function', 'RootCostFunction')
     def calculate(self, cur_run_file):
         '''determine the value of each run'''
+        # Get data to compare
+        cur_info = self._getData(cur_run_file)
+        tgt_info = self._getData(self._tgt_run)
+        # Calculate difference
+        self._cost = tgt_info - cur_info  # abs()?
         # Apply the weight to the cost function
         self._cost *= self.__weight
+        if (False):  # ('all' in cur_run_file):
+            Debug.log('cost: {} = {} - {}'.format(
+                self._cost,
+                tgt_info,
+                cur_info,
+            ))
         return self._cost
 
     #############################################
     # DATA RETRIEVAL                            #
     #############################################
-    @rootClassMethod
+    @rootClassMethod('cost.root_cost_function', 'RootCostFunction')
     def _getData(self, from_file):
+        # implement in child classes
         pass

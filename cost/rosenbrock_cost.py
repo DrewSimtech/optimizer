@@ -3,8 +3,7 @@
 from cost.root_cost_function import RootCostFunction
 
 
-# Class definition
-class AckleyCostFunction(RootCostFunction):
+class RosenbrockCostFunction(RootCostFunction):
 
     #############################################
     # INITIALIZATION                            #
@@ -24,6 +23,6 @@ class AckleyCostFunction(RootCostFunction):
         # open the file and read the info from it
         with open(from_file, 'r') as ff:
             for line in iter(ff.readline, ''):
-                if ('ackley' in line.lower()):
+                if ('rosenbrock' in line.lower()):
                     return float(line.partition('= ')[-1])
         # this implementation doesn't call super()
