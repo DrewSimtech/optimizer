@@ -45,6 +45,7 @@ class Debug:
             Debug.err = None
 
     @staticmethod
-    def log(msg):
-        Debug.out.write(str(msg) + '\n')
-        Debug.out.flush()
+    def log(msg, can_write=True):
+        if (can_write):
+            Debug.out.write(str(msg) + '\n')
+            Debug.out.flush()
