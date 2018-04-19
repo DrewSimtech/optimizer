@@ -30,6 +30,16 @@ class RootCostFunction(object):
     def calculate(self, cur_run_file):
         '''determine the value of each run'''
         # Get data to compare
+        self._cost = self._getData(cur_run_file)
+        # Apply the weight to the cost function
+        self._cost *= self.__weight
+        Debug.log('cost: {}'.format(self._cost), False)
+        return self._cost
+
+    @rootClassMethod('cost.root_cost_function', 'RootCostFunction')
+    def calculateRelative(self, cur_run_file):
+        '''determine the value of each run'''
+        # Get data to compare
         cur_info = self._getData(cur_run_file)
         tgt_info = self._getData(self._tgt_run)
         # Calculate difference

@@ -34,17 +34,17 @@ class BFGSManager(object):
         self._initStatesAndGradients(
             prime_costs, first_costs, step, resolution)
         self._initBFGS()
-        self.updateMutableValuesAndSteps()
+        # self.updateMutableValuesAndSteps()
 
     def _initStatesAndGradients(self, prime_costs, first_costs,
                                 step, resolution):
         self.updateStatesAndGradients(prime_costs, 0, resolution)
-        self.updateStatesAndGradients(first_costs, step, resolution)
+        # self.updateStatesAndGradients(first_costs, step, resolution)
 
     def _initBFGS(self):
         # initial matrix B[0] = I where diagonal length = number of mutables
         self._bfgs.append(np.matrix(np.identity(len(self._mutables))))
-        self.updateBFGSandRHO()
+        # self.updateBFGSandRHO()
 
     #############################################
     # CALCULATE STEP SIZING                     #
@@ -97,12 +97,12 @@ class BFGSManager(object):
                                  2.0 * gradient_width,
                                  ), debug_write)
             # append k+1 state and gradient to the list\
-            Debug.log('step: ' + str(step) + ' resolution: ' + str(resolution))
-            Debug.log('Value: ' + str(m.getValueAtStep(step, resolution)))
-            self._states[next][m.name] = m.getValueAtStep(step, resolution)
+            val = m.getValueAtStep(step, resolution)
+            Debug.log('val: ' + str(val))
+            self._states[next][m.name] = val
             self._gradients[next][m.name] = gradient
-        Debug.log('states:\n' + str(self._states))
-        Debug.log('grades:\n' + str(self._gradients))
+        Debug.log('states:\n' + str(self._states), )
+        Debug.log('grades:\n' + str(self._gradients), )
 
     def updateBFGSandRHO(self):
         # ================================================================ #

@@ -56,7 +56,7 @@ class RootWalker(object):
         self._bfgs_man.initBaselineData(
             prime_costs, first_costs, first_run_step, resolution)
         self._iterations = 0
-        self._previous_curve = None
+        self._previous_curve = ('None', float('NaN'))
 
     #############################################
     # CREATING DATA                             #
@@ -104,7 +104,7 @@ class RootWalker(object):
             Debug.log(msg.format(epsilon))
             continue_searching = False
         # if the same step is the flattest twice: then we've hit local minima
-        elif (self._flattest_curve == self._previous_curve):
+        elif (self._flattest_curve[1] == self._previous_curve[1]):
             Debug.log("We've hit a local minimum.")
             # TODO: create a gradient between step[i] and step[i+1]
             # and refine our search with smaller increments until we
@@ -137,6 +137,9 @@ class RootWalker(object):
         test = 15
         continue_searching = True
         while(continue_searching):
+            Debug.log('')
+            Debug.log('*' * 50)
+            Debug.log('')
             # Launch info
             self._launchSet(num_runs, resolution)
             # Calculate how far from target we are
