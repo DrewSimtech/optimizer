@@ -32,6 +32,16 @@ class RootWalker(object):
         self._launcher = launcher
 
     #############################################
+    # SPECIAL INSTRUCTIONS FOR FIRST RUNSET     #
+    #############################################
+    # We calculate a special first run scenario so that we dont
+    # run into issues where we have the same curve twice in a row.
+    # It breaks the matrix math if we have the same curve twice.
+    @rootClassMethod('walker.root_walker', 'RootWalker')
+    def _firstLaunchSet(self, ):
+        pass
+
+    #############################################
     # BUILDING THE INITIAL BFGS MATRIX          #
     #############################################
     # Done after the first runset has been launched.
@@ -108,7 +118,7 @@ class RootWalker(object):
             Debug.log("We've hit a local minimum.")
             # TODO: create a gradient between step[i] and step[i+1]
             # and refine our search with smaller increments until we
-            # get to epsilon
+            # get to epsilon ??? probably not ???
             continue_searching = False
         # otherwise calculate our next set of search parameters
         else:
@@ -134,12 +144,10 @@ class RootWalker(object):
         # Set number of runs per step based on resolution percentage
         num_runs = int(1.0 / resolution)
         first_pass = True
-        test = 15
+        test = 500
         continue_searching = True
         while(continue_searching):
-            Debug.log('')
-            Debug.log('*' * 50)
-            Debug.log('')
+            Debug.log('' + '*' * 50 + '')
             # Launch info
             self._launchSet(num_runs, resolution)
             # Calculate how far from target we are
@@ -153,7 +161,7 @@ class RootWalker(object):
                 costs, resolution, epsilon)
             self._iterations += 1
             if (test < 0):
-                Debug.log('Loop exit from test iteration limit(15).')
+                Debug.log('Loop exit from test iteration limit(100).')
                 break
             test -= 1
         msg = 'Closest fit after {0._iterations}: {0._flattest_curve}'

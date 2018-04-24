@@ -25,10 +25,17 @@ def rootClassMethod(mod_name, cls_name):
 class Debug:
     out = sys.stdout  # = None if we dont need prints
     err = sys.stderr  # = None if we dont need prints
+    file = None
+    file_only = False
+
+    @staticmethod
+    def initialize(log_file='deubg.log', file_only=True):
+        Debug.file = open(log_file, 'w')
+        Debug.file_only = file_only
 
     @staticmethod
     def toggleDebug():
-        if(Debug.out):
+        if(Debug.out != Debug.file):
             Debug.out = None
             Debug.err = None
         else:
@@ -47,5 +54,8 @@ class Debug:
     @staticmethod
     def log(msg, can_write=True):
         if (can_write):
-            Debug.out.write(str(msg) + '\n')
-            Debug.out.flush()
+            if (not Debug.file_only):
+                Debug.out.write(str(msg) + '\n')
+                Debug.out.flush()
+            if (Debug.file):
+                Debug.file.write(str(msg) + '\n')

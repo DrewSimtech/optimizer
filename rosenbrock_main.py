@@ -7,9 +7,14 @@ from launcher.rosenbrock_launcher import RosenbrockLauncher
 
 def getMutables():
     mutables = []
-    mutables.append(MutableVar(name='rb_x', start_value=0.50, step_width=-0.5))
-    mutables.append(MutableVar(name='rb_y', start_value=3.0, step_width=-0.5))
-    # mutables.append(MutableVar(name='z', start_value=5, step_width=0.1))
+    mutables.append(
+        MutableVar(name='rb_x', start_value=50.0, step_width=-10.5))
+    mutables.append(
+        MutableVar(name='rb_y', start_value=30.0, step_width=-20.5))
+    # mutables.append(
+    #     MutableVar(name='rb_x', start_value=5.0, step_width=10.5))
+    # mutables.append(
+    #     MutableVar(name='rb_y', start_value=3.0, step_width=6.5))
     return mutables
 
 

@@ -46,12 +46,11 @@ class RootCostFunction(object):
         self._cost = tgt_info - cur_info  # abs()?
         # Apply the weight to the cost function
         self._cost *= self.__weight
-        if (False):  # ('all' in cur_run_file):
-            Debug.log('cost: {} = {} - {}'.format(
-                self._cost,
-                tgt_info,
-                cur_info,
-            ))
+        Debug.log('cost: {} = {} - {}'.format(
+            self._cost,
+            tgt_info,
+            cur_info,
+        ), False)
         return self._cost
 
     #############################################

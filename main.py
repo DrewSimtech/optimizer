@@ -7,6 +7,7 @@ from rosenbrock_main import getMutables, getCostFuncs, getLauncher
 # from ackley_main import getMutables, getCostFuncs, getLauncher
 # from pythag_main import getMutables, getCostFuncs, getLauncher
 from walker.walker import Walker
+from debug import Debug
 
 
 def clearPreviousRunData():
@@ -32,4 +33,5 @@ def main():
 
 # entry point
 if __name__ == '__main__':
+    Debug.initialize()
     main()

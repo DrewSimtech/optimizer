@@ -1,3 +1,4 @@
 Hello World!
 Pythag = 8.6
-Ackley = 10.3
+Ackley = 0.3
+Rosenbrock = 303685351.0
