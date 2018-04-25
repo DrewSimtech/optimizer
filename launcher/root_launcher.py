@@ -14,7 +14,7 @@ class RootLauncher(object):
     card_name_layout += '{0._base_file_trimmed}_{gradient}.CRD'
     run_name_in_dir = '{run_dir}/{this._base_file_trimmed}_{gradient}.CRD'
     mutable_data_layout = '{name} = {value}\n'
-    cur_iter_archive = '{0._data_dir}/step_map/iteration_{1}/'
+    cur_iter_archive = '{0._data_dir}/step_map/iteration_{1:0>4}/'
     baseline_dir = '{0._data_dir}/step_map/baseline/'
 
     #############################################
@@ -67,23 +67,41 @@ class RootLauncher(object):
     # CREATE RUN DATA                           #
     #############################################
     @rootClassMethod('launcher.root_launcher', 'RootLauncher')
-    def _clearRunData(self):
+    def clearRunData(self):
         # rmtree is dangerous cause it will remove the folder and
         # all of its contents. So be careful with what we remove.
         # Don't want to accedently clean an entire folder of code.
+        Debug.log('Clear Run Data.')
         for run in self._cards_to_launch:
             # check for data before we attempt delete.
             if (os.access(run, os.R_OK)):
                 del_dir = self.getDirNameFromRunName(run)
                 shutil.rmtree(del_dir)
         self._cards_to_launch[:] = []
+        self._run_number = 0
+
+    @rootClassMethod('launcher.root_launcher', 'RootLauncher')
+    def firstCreateRuns(self, mutables):
+        add_mutables = []
+        sub_mutables = []
+        for m in mutables:
+            gradient = m.getGradientWidthAtStep(0.0, 0.0)
+            value = m.getValueAtStep(0.0, 0.0)
+            p = m.getCopy()
+            s = m.getCopy()
+            p.setCurValue(value + gradient)
+            s.setCurValue(value - gradient)
+            add_mutables.append(p)
+            sub_mutables.append(s)
+        # create single seed runs with gradients
+        self.createRuns(add_mutables, num_runs=1, resolution=0.0)
+        self.createRuns(sub_mutables, num_runs=1, resolution=0.0)
 
     @rootClassMethod('launcher.root_launcher', 'RootLauncher')
     def createRuns(self, mutables, num_runs=10, resolution=0.1):
         # clear launch set before building the next ones
-        self._clearRunData()
         for i in range(num_runs):
-            self._run_number = i  # += 1?
+            self._run_number += 1  # = i?
             self._populateCard(i, mutables, resolution, None, 'all', 0.0)
             for m in mutables:
                 self._populateCard(

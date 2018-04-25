@@ -39,40 +39,45 @@ class RootWalker(object):
     # It breaks the matrix math if we have the same curve twice.
     @rootClassMethod('walker.root_walker', 'RootWalker')
     def _firstLaunchSet(self, ):
-        pass
+        self._launcher.clearRunData()
+        self._launcher.firstCreateRuns(self._bfgs_man.getMutables())
+        self._launcher.launch()
+        costs = self._calculateCosts()
+        self._setupBFGSManager(costs)
+        # return self.determineSteps(costs, resolution=0.0, epsilon=0.0)
 
     #############################################
     # BUILDING THE INITIAL BFGS MATRIX          #
     #############################################
     # Done after the first runset has been launched.
     @rootClassMethod('walker.root_walker', 'RootWalker')
-    def _setupBFGSManager(self, costs, resolution):
+    def _setupBFGSManager(self, costs):
         # grab the first runset
         init_run_batch = self._launcher.getLatestRunset()
+        Debug.log('init_run_batch')
+        for name in init_run_batch:
+            Debug.log(name)
         # grab runs at k[0]
         prime_run_dir = self._launcher.getDirNameFromRunName(
             init_run_batch[0])
         prime_costs = \
             dict((x, y) for x, y in costs.items() if prime_run_dir in x)
-        # grab runs at k[1]: means we need to find the smallest cost run
-        self._flattest_curve = self._bfgs_man.findSmallestCost(costs)
-        first_run_step = self._launcher.getStepFromRunName(
-            self._flattest_curve[0])
+        # grab runs at k[1]
         first_run_dir = self._launcher.getDirNameFromRunName(
-            self._flattest_curve[0])
+            init_run_batch[-1])
         first_costs = \
             dict((x, y) for x, y in costs.items() if first_run_dir in x)
         # init baseline using the data we've just gathered
-        self._bfgs_man.initBaselineData(
-            prime_costs, first_costs, first_run_step, resolution)
+        self._bfgs_man.initBaselineData(prime_costs, first_costs)
+        self._previous_curve = self._bfgs_man.findSmallestCost(costs)
         self._iterations = 0
-        self._previous_curve = ('None', float('NaN'))
 
     #############################################
     # CREATING DATA                             #
     #############################################
     @rootClassMethod('walker.root_walker', 'RootWalker')
     def _launchSet(self, num_runs=10, resolution=0.1):
+        self._launcher.clearRunData()
         self._launcher.createRuns(
             self._bfgs_man.getMutables(), num_runs, resolution)
         self._launcher.launch()
@@ -143,23 +148,22 @@ class RootWalker(object):
     def run(self, resolution=0.01, epsilon=0.001):
         # Set number of runs per step based on resolution percentage
         num_runs = int(1.0 / resolution)
-        first_pass = True
+        # initialize the search slope and the bfgs matrix.
+        self._firstLaunchSet()
+        # prevent infinite loops durring testing.
         test = 500
+        # search condition trigger
         continue_searching = True
         while(continue_searching):
+            self._iterations += 1
             Debug.log('' + '*' * 50 + '')
             # Launch info
             self._launchSet(num_runs, resolution)
             # Calculate how far from target we are
             costs = self._calculateCosts()
-            if (first_pass):
-                # initializing the baseline bfgs requires costs
-                self._setupBFGSManager(costs, resolution)
-                first_pass = False
             # find our next move
             continue_searching = self.determineSteps(
                 costs, resolution, epsilon)
-            self._iterations += 1
             if (test < 0):
                 Debug.log('Loop exit from test iteration limit(100).')
                 break

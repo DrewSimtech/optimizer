@@ -21,6 +21,12 @@ class MutableVar(object):
         assert not hasattr(super(), 'setCurStepWidth')
         self._cur_step_width = width
 
+    # I can use eval to copy variables like this because
+    # I set up __repr__ correctly. gross? dangerous?
+    # sorry not sorry.
+    def getCopy(self):
+        return eval(str(self))
+
     #############################################
     # ACCESSORS                                 #
     #############################################

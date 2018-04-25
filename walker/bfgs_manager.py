@@ -29,22 +29,23 @@ class BFGSManager(object):
     # These calculations are performed after the first run has
     # completed. It requires two runs to be performed
     # in order to build a set of data to iterate upon.
-    def initBaselineData(self, prime_costs, first_costs,
-                         step, resolution):
-        self._initStatesAndGradients(
-            prime_costs, first_costs, step, resolution)
-        self._initBFGS()
-        # self.updateMutableValuesAndSteps()
-
-    def _initStatesAndGradients(self, prime_costs, first_costs,
-                                step, resolution):
-        self.updateStatesAndGradients(prime_costs, 0, resolution)
-        # self.updateStatesAndGradients(first_costs, step, resolution)
-
-    def _initBFGS(self):
-        # initial matrix B[0] = I where diagonal length = number of mutables
+    def initBaselineData(self, prime, first):
+        # calc out the new gradients
+        self.updateStatesAndGradients(prime, step=0.0, resolution=0.0)
+        self.updateStatesAndGradients(first, step=0.0, resolution=0.0)
+        # we have to manualy update the states here because i messed up the
+        # architecture and this is easier.
+        # TODO: rewrite this so we dont have to overwrite the states with
+        # this jank nonsense code
+        for m in self._mutables:
+            grad = m.getGradientWidthAtStep(0.0, 0.0)
+            val = m.getValueAtStep(0.0, 0.0)
+            self._states[0][m.name] = val - grad
+            self._states[1][m.name] = val + grad
+        Debug.log('new states:\n' + str(self._states))
         self._bfgs.append(np.matrix(np.identity(len(self._mutables))))
-        # self.updateBFGSandRHO()
+        self.updateBFGSandRHO()
+        self.updateMutableValuesAndSteps()
 
     #############################################
     # CALCULATE STEP SIZING                     #
@@ -118,7 +119,7 @@ class BFGSManager(object):
         # s[k] = alpha[k] rho[k] = mutable_values[k+1] - mutable_values[k] #
         # ================================================================ #
 
-        debug_write = False
+        debug_write = True
 
         # create and format np matricies using passed in dicts of data
         # use .T to get them into 1xN size matricies
