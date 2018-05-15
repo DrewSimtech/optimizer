@@ -7,8 +7,8 @@ from launcher.ackley_launcher import AckleyLauncher
 
 def getMutables():
     mutables = []
-    mutables.append(MutableVar(name='x', start_value=50.1, step_width=-12.0))
-    mutables.append(MutableVar(name='y', start_value=31.3, step_width=-18.0))
+    mutables.append(MutableVar(name='x', start_value=0.4, step_width=-12.0))
+    mutables.append(MutableVar(name='y', start_value=0.4, step_width=-18.0))
     # mutables.append(MutableVar(name='z', start_value=5, step_width=0.1))
     return mutables
 

@@ -102,8 +102,8 @@ class BFGSManager(object):
             Debug.log('val: ' + str(val))
             self._states[next][m.name] = val
             self._gradients[next][m.name] = gradient
-        Debug.log('states:\n' + str(self._states), )
-        Debug.log('grades:\n' + str(self._gradients), )
+        Debug.log('states:\n' + str(self._states), debug_write)
+        Debug.log('grades:\n' + str(self._gradients), debug_write)
 
     def updateBFGSandRHO(self):
         # ================================================================ #
@@ -119,7 +119,7 @@ class BFGSManager(object):
         # s[k] = alpha[k] rho[k] = mutable_values[k+1] - mutable_values[k] #
         # ================================================================ #
 
-        debug_write = True
+        debug_write = False
 
         # create and format np matricies using passed in dicts of data
         # use .T to get them into 1xN size matricies

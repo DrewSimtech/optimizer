@@ -6,7 +6,7 @@ class MutableVar(object):
     #############################################
     # INITIALIZATION                            #
     #############################################
-    def __init__(self, name, start_value, step_width, **kwargs):
+    def __init__(self, name, start_value, step_width=0.01, **kwargs):
         self.name = name
         self._start_value = start_value
         self.setCurValue(start_value)
@@ -53,5 +53,5 @@ class MutableVar(object):
         return (self.name == other.name)
 
     def __repr__(self):
-        msg = 'MutableVar("{0.name}", {0._cur_value}, {0._cur_step_width})'
+        msg = 'MutableVar("{0.name}", {0._cur_value} , {0._cur_step_width})'
         return msg.format(self)
