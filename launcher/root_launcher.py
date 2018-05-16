@@ -71,7 +71,6 @@ class RootLauncher(object):
         # rmtree is dangerous cause it will remove the folder and
         # all of its contents. So be careful with what we remove.
         # Don't want to accedently clean an entire folder of code.
-        Debug.log('Clear Run Data.')
         for run in self._cards_to_launch:
             # check for data before we attempt delete.
             if (os.access(run, os.R_OK)):

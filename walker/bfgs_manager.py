@@ -74,7 +74,7 @@ class BFGSManager(object):
             xi_minus = list(x for x in xi_runs if 'minus' in x.lower())[0]
             Debug.log('xim: ' + str(xi_minus), debug_write)
             # get offsets widths for calculating gradients
-            Debug.log('step: ' + str(step))
+            Debug.log('step: ' + str(step), debug_write)
             gradient_width = m.getGradientWidthAtStep(step, resolution)
             Debug.log('grad: ' + str(gradient_width), debug_write)
             # ======================================================= #
@@ -99,7 +99,7 @@ class BFGSManager(object):
                                  ), debug_write)
             # append k+1 state and gradient to the list\
             val = m.getValueAtStep(step, resolution)
-            Debug.log('val: ' + str(val))
+            Debug.log('val: ' + str(val), debug_write)
             self._states[next][m.name] = val
             self._gradients[next][m.name] = gradient
         Debug.log('states:\n' + str(self._states), debug_write)
@@ -177,3 +177,48 @@ class BFGSManager(object):
             m.setCurValue(self._states[-1][m.name])
             m.setCurStepWidth(self._rho[-1][m.name])
             Debug.log(str(m))
+
+    def updateMutableSteps(self):
+        for m in self._mutables:
+            m.setCurStepWidth(self._rho[-1][m.name])
+            Debug.log(str(m))
+
+    #############################################
+    # DISCOVERING EXTREMA                       #
+    #############################################
+    def determineExtrema(self, epsilon=0.01):
+        '''Returns:
+        True if at a local minimum.
+        False otherwise.'''
+        # ============================================================== #
+        # calculate gradient norm to check for an extrema based on       #
+        # the Kuhn Tucker optimality conditions:                         #
+        # https://en.wikipedia.org/wiki/Karush-Kuhn-Tucker_conditions    #
+        # first condition is that the gradient vanishes:                 #
+        #           lim(x -> x*) ||g[k]|| -> 0                           #
+        # effectively:                                                   #
+        #           ||g[k]|| < ε[c]                                      #
+        # the second condition is that the Hessian is positive definite: #
+        #           B[k] = ΓΛΓt                                          #
+        # Γ being the eigenvector matrix and                             #
+        # Λ being the matrix of eigenvalues                              #
+        # as the solution approaches a minima the Hessian becomes        #
+        # positive definite, therefore all eigenvalues [λ1, .., λn] must #
+        # all be greater than 0.                                         #
+        #           lim(x -> x*) as B[k] -> B* : ∀λ[i] > 0               #
+        # ============================================================== #
+        
+        debug_write = True
+        gradient_norm = 0.0
+        for g in self._gradients[-1].values():
+            gradient_norm += g * g
+        Debug.log('||g[k]|| = {0}'.format(gradient_norm), debug_write)
+        if (epsilon > gradient_norm):
+            # the BFGS matrix is always symetric so use eigh instead of eig
+            eigenvalues = np.linalg.eigh(self._bfgs[-1])[0]
+            Debug.log('EV: {0}'.format(eigenvalues), debug_write)
+            for ev in eigenvalues:
+                if (0.0 > ev):
+                    return False
+            return True
+        return False
