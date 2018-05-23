@@ -15,6 +15,7 @@ class BFGSManager(object):
         self._gradients = []
         self._bfgs = []
         self._rho = []
+        self._debug_write = False
 
     def setMutables(self, mutables):
         self._mutables = mutables
@@ -60,7 +61,6 @@ class BFGSManager(object):
         return smallest_cost
 
     def updateStatesAndGradients(self, costs, step, resolution):
-        debug_write = False
         # append the next set of states and gradients
         self._states.append({})
         self._gradients.append({})
@@ -68,15 +68,15 @@ class BFGSManager(object):
         for m in self._mutables:
             # get set of plus and minus runs per variable name.
             xi_runs = {x for x in costs.keys() if m.name.lower() in x.lower()}
-            Debug.log('costs:\n' + str(xi_runs), debug_write)
+            Debug.log('costs:\n' + str(xi_runs), self._debug_write)
             xi_plus = list(x for x in xi_runs if 'plus' in x.lower())[0]
-            Debug.log('xip: ' + str(xi_plus), debug_write)
+            Debug.log('xip: ' + str(xi_plus), self._debug_write)
             xi_minus = list(x for x in xi_runs if 'minus' in x.lower())[0]
-            Debug.log('xim: ' + str(xi_minus), debug_write)
+            Debug.log('xim: ' + str(xi_minus), self._debug_write)
             # get offsets widths for calculating gradients
-            Debug.log('step: ' + str(step), debug_write)
+            Debug.log('step: ' + str(step), self._debug_write)
             gradient_width = m.getGradientWidthAtStep(step, resolution)
-            Debug.log('grad: ' + str(gradient_width), debug_write)
+            Debug.log('grad: ' + str(gradient_width), self._debug_write)
             # ======================================================= #
             # calculate gradient per variable:                        #
             #           F(x[i] + s[i]) - F(x[i] - s[i])               #
@@ -85,8 +85,8 @@ class BFGSManager(object):
             # where x is the value of the mutable at the current step #
             # s is the gradient width at the same step                #
             # ======================================================= #
-            Debug.log('costs[xip]: ' + str(costs[xi_plus]), debug_write)
-            Debug.log('costs[xim]: ' + str(costs[xi_minus]), debug_write)
+            Debug.log('costs[xip]: ' + str(costs[xi_plus]), self._debug_write)
+            Debug.log('costs[xim]: ' + str(costs[xi_minus]), self._debug_write)
             gradient = (costs[xi_plus] - costs[xi_minus])
             gradient /= (2.0 * gradient_width)
             msg = 'full: {0}\n({1} - {2}) / (2.0 * {3})\n{4} / {5}'
@@ -96,14 +96,14 @@ class BFGSManager(object):
                                  gradient_width,
                                  costs[xi_plus] - costs[xi_minus],
                                  2.0 * gradient_width,
-                                 ), debug_write)
+                                 ), self._debug_write)
             # append k+1 state and gradient to the list\
             val = m.getValueAtStep(step, resolution)
-            Debug.log('val: ' + str(val), debug_write)
+            Debug.log('val: ' + str(val), self._debug_write)
             self._states[next][m.name] = val
             self._gradients[next][m.name] = gradient
-        Debug.log('states:\n' + str(self._states), debug_write)
-        Debug.log('grades:\n' + str(self._gradients), debug_write)
+        Debug.log('states:\n' + str(self._states), self._debug_write)
+        Debug.log('grades:\n' + str(self._gradients), self._debug_write)
 
     def updateBFGSandRHO(self):
         # ================================================================ #
@@ -119,8 +119,6 @@ class BFGSManager(object):
         # s[k] = alpha[k] rho[k] = mutable_values[k+1] - mutable_values[k] #
         # ================================================================ #
 
-        debug_write = False
-
         # create and format np matricies using passed in dicts of data
         # use .T to get them into 1xN size matricies
         def getMatrixOfValues(info):
@@ -129,19 +127,19 @@ class BFGSManager(object):
             for m in self._mutables:
                 name_list += m.name + ' . '
                 mat.append(info[m.name])
-            Debug.log('Names: ' + name_list, debug_write)
+            Debug.log('Names: ' + name_list, self._debug_write)
             return np.matrix(mat).T
 
         # create y[k]
         gkc = getMatrixOfValues(self._gradients[-2])
         gkn = getMatrixOfValues(self._gradients[-1])
         yk = np.subtract(gkn, gkc)
-        Debug.log('yk:\n' + str(yk), debug_write)
+        Debug.log('yk:\n' + str(yk), self._debug_write)
         # create s[k]
         xkc = getMatrixOfValues(self._states[-2])
         xkn = getMatrixOfValues(self._states[-1])
         sk = np.subtract(xkn, xkc)
-        Debug.log('sk:\n' + str(sk), debug_write)
+        Debug.log('sk:\n' + str(sk), self._debug_write)
 
         # cache B[k] from our list
         bk = self._bfgs[-1]
@@ -169,8 +167,8 @@ class BFGSManager(object):
         for m in self._mutables:
             rho_names += m.name + ' . '
             self._rho[-1][m.name] = next(rho_gen)
-        Debug.log('Rho names: ' + rho_names, debug_write)
-        Debug.log('rho:\n' + str(self._rho), debug_write)
+        Debug.log('Rho names: ' + rho_names, self._debug_write)
+        Debug.log('rho:\n' + str(self._rho), self._debug_write)
 
     def updateMutableValuesAndSteps(self):
         for m in self._mutables:
@@ -208,15 +206,14 @@ class BFGSManager(object):
         #           lim(x -> x*) as B[k] -> B* : ∀λ[i] > 0               #
         # ============================================================== #
         
-        debug_write = True
         gradient_norm = 0.0
         for g in self._gradients[-1].values():
             gradient_norm += g * g
-        Debug.log('||g[k]|| = {0}'.format(gradient_norm), debug_write)
+        Debug.log('||g[k]|| = {0}'.format(gradient_norm), self._debug_write)
         if (epsilon > gradient_norm):
             # the BFGS matrix is always symetric so use eigh instead of eig
             eigenvalues = np.linalg.eigh(self._bfgs[-1])[0]
-            Debug.log('EV: {0}'.format(eigenvalues), debug_write)
+            Debug.log('EV: {0}'.format(eigenvalues), self._debug_write)
             for ev in eigenvalues:
                 if (0.0 > ev):
                     return False

@@ -4,7 +4,8 @@ import os
 import shutil
 import time
 # Local imports
-from rosenbrock_main import getMutables, getCostFuncs, getLauncher
+# from rosenbrock_main import getMutables, getCostFuncs, getLauncher
+from himmelblau_main import getMutables, getCostFuncs, getLauncher
 # from ackley_main import getMutables, getCostFuncs, getLauncher
 # from pythag_main import getMutables, getCostFuncs, getLauncher
 from walker.walker import Walker
@@ -35,6 +36,9 @@ def main():
     end = time.time()
     print('end    : ' + str(time.ctime()))
     print('elapsed: ' + str(end - start) + 's')
+    Debug.log('start  : ' + str(time.ctime()))
+    Debug.log('end    : ' + str(time.ctime()))
+    Debug.log('elapsed: ' + str(end - start) + 's')
 
 
 # entry point
