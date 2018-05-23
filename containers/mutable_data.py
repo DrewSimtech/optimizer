@@ -1,3 +1,4 @@
+from debug import rootClassMethod
 
 
 # Class definition
@@ -11,14 +12,14 @@ class MutableVar(object):
         self._start_value = start_value
         self.setCurValue(start_value)
         self.setCurStepWidth(step_width)
-        super().__init__(**kwargs)
+        super(MutableVar, self).__init__(**kwargs)
 
+    @rootClassMethod('containers.mutable_data', 'MutableVar')
     def setCurValue(self, value):
-        assert not hasattr(super(), 'setCurValue')
         self._cur_value = value
 
+    @rootClassMethod('containers.mutable_data', 'MutableVar')
     def setCurStepWidth(self, width):
-        assert not hasattr(super(), 'setCurStepWidth')
         self._cur_step_width = width
 
     # I can use eval to copy variables like this because
@@ -30,12 +31,12 @@ class MutableVar(object):
     #############################################
     # ACCESSORS                                 #
     #############################################
+    @rootClassMethod('containers.mutable_data', 'MutableVar')
     def getValueAtStep(self, at_step=0, resolution=0.1):
-        assert not hasattr(super(), 'getValueAtStep')
         return self._cur_value + self._cur_step_width * resolution * at_step
 
+    @rootClassMethod('containers.mutable_data', 'MutableVar')
     def getGradientWidthAtStep(self, at_step=0, resolution=0.1):
-        assert not hasattr(super(), 'getGradientWidthAtStep')
         #            F(x[i] + s[i]) - F(x[i] - s[i])
         # g(x[i]) = ---------------------------------
         #                        2s[i]

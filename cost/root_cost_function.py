@@ -16,7 +16,7 @@ class RootCostFunction(object):
         # Filenames for the data to compare
         self.setTargetFile(tgt_run)
         # pass on init
-        super().__init__(**kwargs)
+        super(RootCostFunction, self).__init__(**kwargs)
 
     @rootClassMethod('cost.root_cost_function', 'RootCostFunction')
     def setTargetFile(self, tgt_run):

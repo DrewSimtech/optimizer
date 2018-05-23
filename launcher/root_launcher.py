@@ -27,7 +27,7 @@ class RootLauncher(object):
         self._card_base_path = os.path.join(self._data_dir, self._base_file)
         self._run_number = 0
         self._cards_to_launch = []
-        super().__init__(**kwargs)
+        super(RootLauncher, self).__init__(**kwargs)
 
     #############################################
     # UTILITY FUNCTIONS                         #

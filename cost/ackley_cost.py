@@ -10,7 +10,7 @@ class AckleyCostFunction(RootCostFunction):
     # INITIALIZATION                            #
     #############################################
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(AckleyCostFunction, self).__init__(**kwargs)
 
     #############################################
     # COST FUNCTION                             #

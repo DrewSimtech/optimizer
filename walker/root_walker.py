@@ -20,7 +20,7 @@ class RootWalker(object):
         self._total_run_count = 0
         self._default_resolution = resolution
         self.setRunResolution(resolution)
-        super().__init__(**kwargs)
+        super(RootWalker, self).__init__(**kwargs)
 
     @rootClassMethod('walker.root_walker', 'RootWalker')
     def _reInit(self):

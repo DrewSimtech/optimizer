@@ -9,7 +9,7 @@ class Walker(RootWalker):
     # INITIALIZATION                            #
     #############################################
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(Walker, self).__init__(**kwargs)
 
     #############################################
     # CALCULATE STEP SIZE                       #

@@ -4,8 +4,8 @@ import os
 import shutil
 import time
 # Local imports
-# from rosenbrock_main import getMutables, getCostFuncs, getLauncher
-from himmelblau_main import getMutables, getCostFuncs, getLauncher
+from rosenbrock_main import getMutables, getCostFuncs, getLauncher
+# from himmelblau_main import getMutables, getCostFuncs, getLauncher
 # from ackley_main import getMutables, getCostFuncs, getLauncher
 # from pythag_main import getMutables, getCostFuncs, getLauncher
 from walker.walker import Walker

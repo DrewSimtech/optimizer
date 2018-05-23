@@ -12,7 +12,7 @@ class HimmelblauLauncher(RootLauncher):
     # INITIALIZATION                            #
     #############################################
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(HimmelblauLauncher, self).__init__(**kwargs)
 
     #############################################
     # CREATE RUN DATA                           #
@@ -44,4 +44,4 @@ class HimmelblauLauncher(RootLauncher):
         # Debug.log(outfile_name + ': ' + str(rosenbrock))
         with open(outfile_name, 'w') as outf:
             outf.write(self.out_data_layout.format(value=himmelblau))
-        super()._launchCard(card)
+        super(HimmelblauLauncher, self)._launchCard(card)

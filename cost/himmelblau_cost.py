@@ -9,7 +9,7 @@ class HimmelblauCostFunction(RootCostFunction):
     # INITIALIZATION                            #
     #############################################
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(HimmelblauCostFunction, self).__init__(**kwargs)
 
     #############################################
     # COST FUNCTION                             #

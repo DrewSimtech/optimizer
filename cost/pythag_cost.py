@@ -10,7 +10,7 @@ class PythagCostFunction(RootCostFunction):
     # INITIALIZATION                            #
     #############################################
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(PythagCostFunction, self).__init__(**kwargs)
 
     #############################################
     # COST FUNCTION                             #
@@ -22,7 +22,7 @@ class PythagCostFunction(RootCostFunction):
         # Calculate difference
         self._cost = tgt_info - cur_info  # abs()?
         # super
-        super().calculate(cur_run_file)
+        super(PythagCostFunction, self).calculate(cur_run_file)
         return self._cost
 
     #############################################

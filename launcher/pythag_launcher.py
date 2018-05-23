@@ -13,7 +13,7 @@ class PythagLauncher(RootLauncher):
     # INITIALIZATION                            #
     #############################################
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(PythagLauncher, self).__init__(**kwargs)
 
     #############################################
     # CREATE RUN DATA                           #
@@ -39,4 +39,4 @@ class PythagLauncher(RootLauncher):
             outfile_name = c[:-4] + '.OUT'
             with open(outfile_name, 'w') as outf:
                 outf.write(self.out_data_layout.format(value=pythag))
-        super().launch()
+        super(PythagLauncher, self).launch()

@@ -13,7 +13,7 @@ class AckleyLauncher(RootLauncher):
     # INITIALIZATION                            #
     #############################################
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(AckleyLauncher, self).__init__(**kwargs)
 
     #############################################
     # CREATE RUN DATA                           #
@@ -44,4 +44,4 @@ class AckleyLauncher(RootLauncher):
         outfile_name = card[:-4] + '.OUT'
         with open(outfile_name, 'w') as outf:
             outf.write(self.out_data_layout.format(value=ackley))
-        super()._launchCard(card)
+        super(AckleyLauncher, self)._launchCard(card)

@@ -11,7 +11,7 @@ class RosenbrockLauncher(RootLauncher):
     # INITIALIZATION                            #
     #############################################
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(RosenbrockLauncher, self).__init__(**kwargs)
 
     #############################################
     # CREATE RUN DATA                           #
@@ -39,4 +39,4 @@ class RosenbrockLauncher(RootLauncher):
         # Debug.log(outfile_name + ': ' + str(rosenbrock))
         with open(outfile_name, 'w') as outf:
             outf.write(self.out_data_layout.format(value=rosenbrock))
-        super()._launchCard(card)
+        super(RosenbrockLauncher, self)._launchCard(card)

@@ -9,7 +9,7 @@ class RosenbrockCostFunction(RootCostFunction):
     # INITIALIZATION                            #
     #############################################
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(RosenbrockCostFunction, self).__init__(**kwargs)
 
     #############################################
     # COST FUNCTION                             #
