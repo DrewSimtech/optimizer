@@ -13,17 +13,30 @@ class RootWalker(object):
     #############################################
     def __init__(self, mutables, cost_funcs, launcher,
                  resolution=0.01, **kwargs):
+        self._storeDefaults(mutables, cost_funcs, launcher, resolution)
         self.setMutables(mutables)
         self.setCostFuncs(cost_funcs)
         self.setLauncher(launcher)
         self._iterations = 0
         self._total_run_count = 0
-        self._default_resolution = resolution
         self.setRunResolution(resolution)
         super(RootWalker, self).__init__(**kwargs)
 
     @rootClassMethod('walker.root_walker', 'RootWalker')
+    def _storeDefaults(self, mutables, cost_funcs, launcher, resolution):
+        self._default = {}
+        self._default['mutables'] = mutables
+        self._default['resolution'] = resolution
+
+    @rootClassMethod('walker.root_walker', 'RootWalker')
     def _reInit(self):
+        # We can skip reseting the cost functions since
+        # "they shouldn't change" (tm) ~Drew M. Streb 05/30/2018
+        self.setMutables(self._default['mutables'])
+        self.setLauncher(eval(self._launcher))
+        self._iterations = 0
+        self._total_run_count = 0
+        self.setRunResolution(self._default['resolution'])
         pass
 
     @rootClassMethod('walker.root_walker', 'RootWalker')
@@ -37,7 +50,6 @@ class RootWalker(object):
 
     @rootClassMethod('walker.root_walker', 'RootWalker')
     def setLauncher(self, launcher):
-        self._launcher_type = type(launcher)
         self._launcher = launcher
 
     @rootClassMethod('walker.root_walker', 'RootWalker')

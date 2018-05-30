@@ -23,10 +23,10 @@ def rootClassMethod(mod_name, cls_name):
 
 # class for printing statments that we only need durring debugging.
 class Debug:
-    out = sys.stdout  # = None if we dont need prints
-    err = sys.stderr  # = None if we dont need prints
-    file = None
-    file_only = False
+    out = sys.stdout   # = None if we dont need prints
+    err = sys.stderr   # = None if we dont need prints
+    file = None        # = None if we dont need a *.log file
+    file_only = False  # = True if we dont need prints but need a *.log file
 
     @staticmethod
     def initialize(log_file='deubg.log', file_only=True):
