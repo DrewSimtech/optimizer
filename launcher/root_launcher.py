@@ -30,9 +30,9 @@ class RootLauncher(object):
         super(RootLauncher, self).__init__(**kwargs)
 
     def __repr__(self):
-        msg = 'RootLauncher('
-        msg += 'base_file=' + str(self._base_file) + ', '
-        msg += 'data_dir=' + str(self._data_dir) + ')'
+        msg = str(type(self)) + "("
+        msg += "base_file='" + str(self._base_file) + "', "
+        msg += "data_dir='" + str(self._data_dir) + "')"
         return msg
 
     #############################################

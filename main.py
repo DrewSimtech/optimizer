@@ -2,13 +2,14 @@
 # Global imports
 import os
 import shutil
-import time
+# import time
 # Local imports
-from rosenbrock_main import getMutables, getCostFuncs, getLauncher
+# from rosenbrock_main import getMutables, getCostFuncs, getLauncher
 # from himmelblau_main import getMutables, getCostFuncs, getLauncher
-# from ackley_main import getMutables, getCostFuncs, getLauncher
+from ackley_main import getMutables, getCostFuncs, getLauncher
 # from pythag_main import getMutables, getCostFuncs, getLauncher
-from walker.walker import Walker
+from walker.random_walker import RandomWalker
+# from walker.walker import Walker
 from debug import Debug
 
 
@@ -20,8 +21,8 @@ def clearPreviousRunData():
 
 
 def main():
-    start = time.time()
-    print('start  : ' + str(time.ctime()))
+    # start = time.time()
+    # print('start  : ' + str(time.ctime()))
     # prelaunch
     clearPreviousRunData()
 
@@ -29,16 +30,20 @@ def main():
     mutables = getMutables()
     cost_funcs = getCostFuncs()
     launcher = getLauncher()
-    walk = Walker(mutables=mutables, cost_funcs=cost_funcs, launcher=launcher)
+    # walk = Walker(mutables, cost_funcs, launcher)
+    walk = RandomWalker(
+        mutables=mutables,
+        cost_funcs=cost_funcs,
+        launcher=launcher)
 
     # launch
     walk.run()
-    end = time.time()
-    print('end    : ' + str(time.ctime()))
-    print('elapsed: ' + str(end - start) + 's')
-    Debug.log('start  : ' + str(time.ctime()))
-    Debug.log('end    : ' + str(time.ctime()))
-    Debug.log('elapsed: ' + str(end - start) + 's')
+    # end = time.time()
+    # print('end    : ' + str(time.ctime()))
+    # print('elapsed: ' + str(end - start) + 's')
+    # Debug.log('start  : ' + str(time.ctime()))
+    # Debug.log('end    : ' + str(time.ctime()))
+    # Debug.log('elapsed: ' + str(end - start) + 's')
 
 
 # entry point

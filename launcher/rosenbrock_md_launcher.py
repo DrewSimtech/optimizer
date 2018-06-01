@@ -14,13 +14,6 @@ class RosenbrockMDLauncher(RootLauncher):
     def __init__(self, **kwargs):
         super(RosenbrockMDLauncher, self).__init__(**kwargs)
 
-    def __repr__(self):
-        # Has no additional kwargs, so it just replaces super()'s
-        # class name with our own.
-        msg = super(RosenbrockMDLauncher, self).__repr__()
-        msg = 'RosenbrockMDLauncher(' + msg.partition('(')[-1]
-        return msg
-
     #############################################
     # CREATE RUN DATA                           #
     #############################################

@@ -1,4 +1,7 @@
 
+# Global package imports
+import time
+import copy
 # Local package imports
 from walker.bfgs_manager import BFGSManager
 from debug import Debug, rootClassMethod
@@ -13,7 +16,7 @@ class RootWalker(object):
     #############################################
     def __init__(self, mutables, cost_funcs, launcher,
                  resolution=0.01, **kwargs):
-        self._storeDefaults(mutables, cost_funcs, launcher, resolution)
+        print('RootWalker.__init__()')
         self.setMutables(mutables)
         self.setCostFuncs(cost_funcs)
         self.setLauncher(launcher)
@@ -21,23 +24,25 @@ class RootWalker(object):
         self._total_run_count = 0
         self.setRunResolution(resolution)
         super(RootWalker, self).__init__(**kwargs)
+        self._storeDefaults()
 
     @rootClassMethod('walker.root_walker', 'RootWalker')
-    def _storeDefaults(self, mutables, cost_funcs, launcher, resolution):
+    def _storeDefaults(self):
+        print('RootWalker._storeDefaults()')
         self._default = {}
-        self._default['mutables'] = mutables
-        self._default['resolution'] = resolution
+        self._default['mutables'] = copy.deepcopy(self._bfgs_man.getMutables())
+        self._default['resolution'] = self._resolution
+        self._default['launcher'] = copy.deepcopy(self._launcher)
 
     @rootClassMethod('walker.root_walker', 'RootWalker')
     def _reInit(self):
         # We can skip reseting the cost functions since
         # "they shouldn't change" (tm) ~Drew M. Streb 05/30/2018
-        self.setMutables(self._default['mutables'])
-        self.setLauncher(eval(self._launcher))
+        self.setMutables(copy.deepcopy(self._default['mutables']))
+        self.setLauncher(copy.deepcopy(self._default['launcher']))
         self._iterations = 0
         self._total_run_count = 0
         self.setRunResolution(self._default['resolution'])
-        pass
 
     @rootClassMethod('walker.root_walker', 'RootWalker')
     def setMutables(self, mutables):
@@ -139,7 +144,8 @@ class RootWalker(object):
         dir_k_next = self._launcher.getDirNameFromRunName(
             self._flattest_curve[0])
         # Archive the data and have a log of the path we took.
-        self._launcher.archiveDir(dir_k_next, self._iterations)
+        # TODO: this was commented out for testing. Uncomment it.
+        # self._launcher.archiveDir(dir_k_next, self._iterations)
         step_k_next = self._launcher.getStepFromRunName(
             self._flattest_curve[0])
 
@@ -151,7 +157,8 @@ class RootWalker(object):
         elif (self._flattest_curve[1] == self._previous_curve[1]):
             Debug.log("ENDING RUN:: We're stuck...")
             continue_searching = False
-        # TODO: if we overshoot the local min and cost[k+1] > cost[k] then:
+        # TODO: https://github.com/DrewSimtech/optimizer/issues/5
+        # if we overshoot the local min and cost[k+1] > cost[k] then:
         # a) increase resolution and rerun?
         # b) recalc BFGS and rerun?
         # c) both?
@@ -167,20 +174,6 @@ class RootWalker(object):
             self._bfgs_man.updateBFGSandRHO()
             self._bfgs_man.updateMutableValuesAndSteps()
             self._previous_curve = self._flattest_curve
-
-            # max_res = 0.2
-            # Debug.log('step: {}   numruns: {}'.format(
-            #     step_k_next, self._num_runs))
-            # if (step_k_next >= self._num_runs):
-            #     # decrease run count -> fewer runs since we're
-            #     # on a strait away and can just ride it down.
-            #     self.setRunResolution(self._resolution * 1.0)  # 1.2)  # 20%
-            #     if (max_res <= self._resolution):
-            #         self.setRunResolution(max_res)
-            # else:
-            #     # increase run count -> more runs since we're
-            #     # starting to approach an extrema, and want finer detail
-            #     self.setRunResolution(self._default_resolution)
         return continue_searching
 
     #############################################
@@ -189,6 +182,10 @@ class RootWalker(object):
     # This method name wasn't meant to be a joke.
     @rootClassMethod('walker.root_walker', 'RootWalker')
     def run(self, epsilon=0.001):
+        # log start time
+        start = time.time()
+        start_str = time.ctime()
+        Debug.log('root start  : ' + str(start_str))
         # Set number of runs per step based on resolution percentage
         # initialize the search slope and the bfgs matrix.
         self._firstLaunchSet()
@@ -213,3 +210,8 @@ class RootWalker(object):
         msg = 'Closest fit after {0._iterations}: {0._flattest_curve}'
         Debug.log(msg.format(self))
         Debug.log('Total run count: {0}'.format(self._total_run_count))
+        # log end/elapsed time
+        end = time.time()
+        Debug.log('root start  : ' + str(start_str))
+        Debug.log('root end    : ' + str(time.ctime()))
+        Debug.log('root elapsed: ' + str(end - start) + 's')
