@@ -1,7 +1,7 @@
 from walker.root_walker import RootWalker
 
 
-class Walker(RootWalker):
+class StdWalker(RootWalker):
     '''Base functionality for the walker class.
     Determines stepsize for runs.'''
 
@@ -9,7 +9,7 @@ class Walker(RootWalker):
     # INITIALIZATION                            #
     #############################################
     def __init__(self, **kwargs):
-        super(Walker, self).__init__(**kwargs)
+        super(StdWalker, self).__init__(**kwargs)
 
     #############################################
     # CALCULATE STEP SIZE                       #

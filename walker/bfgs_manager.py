@@ -67,7 +67,8 @@ class BFGSManager(object):
         next = -1
         for m in self._mutables:
             # get set of plus and minus runs per variable name.
-            xi_runs = {x for x in costs.keys() if m.name.lower() in x.lower()}
+            xi_runs = list(
+                x for x in costs.keys() if m.name.lower() in x.lower())
             Debug.log('costs:\n' + str(xi_runs), self._debug_write)
             xi_plus = list(x for x in xi_runs if 'plus' in x.lower())[0]
             Debug.log('xip: ' + str(xi_plus), self._debug_write)

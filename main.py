@@ -9,7 +9,7 @@ import shutil
 from ackley_main import getMutables, getCostFuncs, getLauncher
 # from pythag_main import getMutables, getCostFuncs, getLauncher
 from walker.random_walker import RandomWalker
-# from walker.walker import Walker
+# from walker.std_walker import StdWalker
 from debug import Debug
 
 
@@ -30,7 +30,7 @@ def main():
     mutables = getMutables()
     cost_funcs = getCostFuncs()
     launcher = getLauncher()
-    # walk = Walker(mutables, cost_funcs, launcher)
+    # walk = StdWalker(mutables, cost_funcs, launcher)
     walk = RandomWalker(
         mutables=mutables,
         cost_funcs=cost_funcs,

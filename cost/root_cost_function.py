@@ -33,7 +33,7 @@ class RootCostFunction(object):
         self._cost = self._getData(cur_run_file)
         # Apply the weight to the cost function
         self._cost *= self.__weight
-        Debug.log('cost: {}'.format(self._cost), False)
+        Debug.log('cost: {0}'.format(self._cost), False)
         return self._cost
 
     @rootClassMethod('cost.root_cost_function', 'RootCostFunction')
@@ -46,7 +46,7 @@ class RootCostFunction(object):
         self._cost = tgt_info - cur_info  # abs()?
         # Apply the weight to the cost function
         self._cost *= self.__weight
-        Debug.log('cost: {} = {} - {}'.format(
+        Debug.log('cost: {0} = {1} - {2}'.format(
             self._cost,
             tgt_info,
             cur_info,

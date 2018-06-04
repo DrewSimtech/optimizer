@@ -29,7 +29,7 @@ class Debug:
     file_only = False  # = True if we dont need prints but need a *.log file
 
     @staticmethod
-    def initialize(log_file='deubg.log', file_only=True):
+    def initialize(log_file='debug.log', file_only=True):
         Debug.file = open(log_file, 'w')
         Debug.file_only = file_only
 
