@@ -190,7 +190,7 @@ class RootWalker(object):
         # initialize the search slope and the bfgs matrix.
         self._firstLaunchSet()
         # prevent infinite loops durring testing.
-        test = 500
+        test = 5000
         # search condition trigger
         continue_searching = True
         while(continue_searching):
@@ -204,7 +204,7 @@ class RootWalker(object):
             continue_searching = self.determineSteps(
                 costs, epsilon)
             if (test < 0):
-                Debug.log('Loop exit from test iteration limit(100).')
+                Debug.log('Loop exit from test iteration limit(500).')
                 break
             test -= 1
         msg = 'Closest fit after {0._iterations}: {0._flattest_curve}'

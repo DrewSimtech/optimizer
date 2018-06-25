@@ -13,11 +13,10 @@ class RandomWalker(RootWalker):
     #############################################
     # INITIALIZATION                            #
     #############################################
-    def __init__(self, loops=10, **kwargs):
+    def __init__(self, loops=500, **kwargs):
         print('RandomWalker.__init__()')
         self.setRunLoops(loops)
         self._extrema_value = []
-        self._extrema_coord = []
         super(RandomWalker, self).__init__(**kwargs)
 
     def _storeDefaults(self):
@@ -31,7 +30,6 @@ class RandomWalker(RootWalker):
         self._starting_locations = [self._default['mutables']]
         self.setRunLoops(self._default['run_loops'])
         self._extrema_value = []
-        self._extrema_coord = []
 
     def _reInitSuperOnly(self):
         super(RandomWalker, self)._reInit()
@@ -45,11 +43,8 @@ class RandomWalker(RootWalker):
     def _updateStartingLocation(self):
         # This pulls a random restart location with a guassian distribution
         updated_loc = []
-        for m in self._default['mutables']:
-            mean = m.getValueAtStep()
-            sigma = 0.1
-            if (0.0 != mean):
-                sigma = abs(mean * 0.03)
+        for m in self._bfgs_man.getMutables():
+            mean, sigma = m.getDistribution()
             gaussian_draw = random.normal(mean, sigma)
             updated_loc.append(MutableVar(m.name, gaussian_draw))
         # TODO: check to ensure we haven't draw this same coordinate before.
@@ -80,8 +75,8 @@ class RandomWalker(RootWalker):
             Debug.log('loops: ' + str(self._run_loops))
             # Do a full run.
             super(RandomWalker, self).run()
-            self._extrema_value.append(self._flattest_curve)
-            self._extrema_coord.append(self._bfgs_man.getMutables())
+            self._extrema_value.append(
+                (self._flattest_curve, self._bfgs_man.getMutables()))
             # separate the runs in the debug log
             Debug.log('\n')
             Debug.log('/\n' * 10)
@@ -97,7 +92,7 @@ class RandomWalker(RootWalker):
         Debug.log('random end    : ' + str(time.ctime()))
         Debug.log('random elapsed: ' + str(end - start) + 's')
         Debug.log('\nextrema found :\n')
-        for i in range(len(self._extrema_value)):
-            Debug.log('   Coord:\n' + str(self._extrema_coord[i]))
-            Debug.log('   Value: ' + str(self._extrema_value[i]))
+        for loc in sorted(self._extrema_value, key=lambda x: x[0][1]):
+            Debug.log('   Coord:\n' + str(loc[1]))
+            Debug.log('   Value: ' + str(loc[0]))
             Debug.log('\n')

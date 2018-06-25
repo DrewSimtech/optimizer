@@ -207,16 +207,24 @@ class BFGSManager(object):
         #           lim(x -> x*) as B[k] -> B* : ∀λ[i] > 0               #
         # ============================================================== #
         
+        # Calculate the magnitude of the gradients
         gradient_norm = 0.0
         for g in self._gradients[-1].values():
             gradient_norm += g * g
+        gradient_norm = np.sqrt(gradient_norm)
         Debug.log('||g[k]|| = {0}'.format(gradient_norm), self._debug_write)
+        
+        # If the gradients are within epsilon bounds then:
+        # Check each Eigen Value (EV) individualy to determine our extrema:
+        # 1) If all EVs are positive then its a minima
+        # 2) If all EVs are negative then its a maxima
+        # 3) If not all EVs are on the same side of 0 then we're on a saddle point
         if (epsilon > gradient_norm):
             # the BFGS matrix is always symetric so use eigh instead of eig
             eigenvalues = np.linalg.eigh(self._bfgs[-1])[0]
-            Debug.log('EV: {0}'.format(eigenvalues), self._debug_write)
-            for ev in eigenvalues:
-                if (0.0 > ev):
-                    return False
+            Debug.log('EVs: {0}'.format(eigenvalues), True)
+            # for ev in eigenvalues:
+            #     if (0.0 > ev):
+            #         return False
             return True
         return False
