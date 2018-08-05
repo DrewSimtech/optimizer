@@ -25,6 +25,7 @@ class RootWalker(object):
         self.setRunResolution(resolution)
         super(RootWalker, self).__init__(**kwargs)
         self._storeDefaults()
+        self._poor_debug_code = 0
 
     @rootClassMethod('walker.root_walker', 'RootWalker')
     def _storeDefaults(self):
@@ -141,13 +142,42 @@ class RootWalker(object):
         self._flattest_curve = self._bfgs_man.findSmallestCost(costs)
         msg = 'Flattest curve at {0._iterations}: {0._flattest_curve}'
         Debug.log(msg.format(self))
+
+        # Detect if the first run was too steep. If run0 < run1 then
+        # we need to discard this run and rerun it from 0 -> 1 instead
+        # of from 0 -> 100.
+        #if(self._previous_curve[1] < self._flattest_curve[1]):
+        #    msg = 'REFINING:: {0} < {1}\n'
+        #    msg += 'REFINING:: Our gradient was too large.'
+        #    Debug.log(msg.format(self._previous_curve[1],
+        #                         self._flattest_curve[1]))
+        #    # self._bfgs_man.refineSearchToFirstStep(self._resolution)
+        #    self.setRunResolution(self._resolution * 0.1)
+        #    Debug.log('REFINING:: Increasing gradient by 10%')
+        #    Debug.log('REFINING:: New Res {0}'.format(self._resolution))
+        #    self._poor_debug_code += 1
+        #    if(3 < self._poor_debug_code):
+        #        exit()
+        #    return continue_searching
+        #self.setRunResolution(0.01)
+
         dir_k_next = self._launcher.getDirNameFromRunName(
             self._flattest_curve[0])
         # Archive the data and have a log of the path we took.
-        # TODO: this was commented out for testing. Uncomment it.
         # self._launcher.archiveDir(dir_k_next, self._iterations)
+        # TODO: The following line was commented out for testing.
+        #       Make sure to uncomment it.
         step_k_next = self._launcher.getStepFromRunName(
             self._flattest_curve[0])
+
+        # Trim info not at the step of closest fit.
+        for c in list(costs.keys())[:]:
+            if (dir_k_next not in c):
+                # Clean the expensive keys from our dictionary.
+                del costs[c]
+        # Update the states and gradients to use the latest calculations
+        self._bfgs_man.updateStatesAndGradients(
+            costs, step_k_next, self._resolution)
 
         # determine if we're close enough to our result.
         if (self._bfgs_man.determineExtrema(epsilon)):
@@ -158,19 +188,13 @@ class RootWalker(object):
             Debug.log("ENDING RUN:: We're stuck...")
             continue_searching = False
         # TODO: https://github.com/DrewSimtech/optimizer/issues/5
-        # if we overshoot the local min and cost[k+1] > cost[k] then:
-        # a) increase resolution and rerun?
-        # b) recalc BFGS and rerun?
-        # c) both?
         else:
-            # trim info not at the step of closest fit.
-            for c in list(costs.keys())[:]:
-                if (dir_k_next not in c):
-                    # Clean the expensive keys from our dictionary.
-                    del costs[c]
-            # math functions are broken up and implemented below.
-            self._bfgs_man.updateStatesAndGradients(
-                costs, step_k_next, self._resolution)
+            # Determine if we need to inject noise to escape a saddle
+            if (self._bfgs_man._gradient_norm == 0.0):
+                Debug.log("SADDLE POINT:: Beginging stocastic draws.")
+                self._bfgs_man.injectStocasticNoise()
+            pass
+            # Math functions are broken up and implemented below.
             self._bfgs_man.updateBFGSandRHO()
             self._bfgs_man.updateMutableValuesAndSteps()
             self._previous_curve = self._flattest_curve
@@ -181,7 +205,7 @@ class RootWalker(object):
     #############################################
     # This method name wasn't meant to be a joke.
     @rootClassMethod('walker.root_walker', 'RootWalker')
-    def run(self, epsilon=0.001):
+    def run(self, epsilon=0.1):
         # log start time
         start = time.time()
         start_str = time.ctime()
@@ -190,7 +214,7 @@ class RootWalker(object):
         # initialize the search slope and the bfgs matrix.
         self._firstLaunchSet()
         # prevent infinite loops durring testing.
-        test = 5000
+        test = 500
         # search condition trigger
         continue_searching = True
         while(continue_searching):
@@ -204,7 +228,7 @@ class RootWalker(object):
             continue_searching = self.determineSteps(
                 costs, epsilon)
             if (test < 0):
-                Debug.log('Loop exit from test iteration limit(500).')
+                Debug.log('Loop exit from test iteration limit.')
                 break
             test -= 1
         msg = 'Closest fit after {0._iterations}: {0._flattest_curve}'

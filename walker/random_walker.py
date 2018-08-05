@@ -13,7 +13,7 @@ class RandomWalker(RootWalker):
     #############################################
     # INITIALIZATION                            #
     #############################################
-    def __init__(self, loops=500, **kwargs):
+    def __init__(self, loops=10, **kwargs):
         print('RandomWalker.__init__()')
         self.setRunLoops(loops)
         self._extrema_value = []
@@ -73,6 +73,7 @@ class RandomWalker(RootWalker):
         Debug.log('random start  : ' + str(start_str))
         while(self._run_loops):
             Debug.log('loops: ' + str(self._run_loops))
+            print('loops: ' + str(self._run_loops))
             # Do a full run.
             super(RandomWalker, self).run()
             self._extrema_value.append(

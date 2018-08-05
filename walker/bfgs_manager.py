@@ -54,6 +54,7 @@ class BFGSManager(object):
     def findSmallestCost(self, costs):
         smallest_cost = ('None', float('inf'))
         for c in costs.items():
+            Debug.log('price: ' + str(c))
             # don't need to check against gradient runs
             if('all' in c[0] and abs(c[1]) < abs(smallest_cost[1])):
                 smallest_cost = c
@@ -183,6 +184,24 @@ class BFGSManager(object):
             Debug.log(str(m))
 
     #############################################
+    # CORRECTION CALCULATIONS                   #
+    #############################################
+    def injectStocasticNoise(self):
+        # TODO: determine the size of the noise. Cant be too big or small
+        # change the values of the gradient vector of the next run?
+        # self._gradients[-1] = (x,y)
+        Debug.log("BFGSManager::injectStocasticNoise() - Not implemented")
+
+    def refineSearchToFirstStep(self, resolution):
+        '''Readjusts the step gradient to from 0->1 instead of 0->100'''
+        for m in self._mutables:
+            Debug.log(str(m))
+            refined_step = m.getValueAtStep(at_step=1, resolution=resolution)
+            refined_step -= m.getValueAtStep(at_step=0, resolution=0)
+            m.setCurStepWidth(refined_step)
+            Debug.log(str(m))
+
+    #############################################
     # DISCOVERING EXTREMA                       #
     #############################################
     def determineExtrema(self, epsilon=0.01):
@@ -211,8 +230,9 @@ class BFGSManager(object):
         gradient_norm = 0.0
         for g in self._gradients[-1].values():
             gradient_norm += g * g
-        gradient_norm = np.sqrt(gradient_norm)
-        Debug.log('||g[k]|| = {0}'.format(gradient_norm), self._debug_write)
+        self._gradient_norm = np.sqrt(gradient_norm)
+        Debug.log('||g[k]|| = {0}'.format(self._gradient_norm), True)
+        # self._debug_write)
         
         # If the gradients are within epsilon bounds then:
         # Check each Eigen Value (EV) individualy to determine our extrema:
@@ -220,6 +240,7 @@ class BFGSManager(object):
         # 2) If all EVs are negative then its a maxima
         # 3) If not all EVs are on the same side of 0 then we're on a saddle point
         if (epsilon > gradient_norm):
+            Debug.log('Epsilon = {0}'.format(epsilon))
             # the BFGS matrix is always symetric so use eigh instead of eig
             eigenvalues = np.linalg.eigh(self._bfgs[-1])[0]
             Debug.log('EVs: {0}'.format(eigenvalues), True)

@@ -46,7 +46,7 @@ class MutableVar(object):
         # such that s[i] = (10^-4) * |x[i]|
         # return s[i]
         value = self.getValueAtStep(at_step, resolution)
-        return (10.0**-4.0) * abs(value)  # abs()?
+        return (10.0**-4.0) * value  # abs()?
         # return (0.01) * self.getValueAtStep(at_step, resolution)
 
     #############################################
