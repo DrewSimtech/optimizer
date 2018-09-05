@@ -15,14 +15,14 @@ class RootWalker(object):
     # INITIALIZATION                            #
     #############################################
     def __init__(self, mutables, cost_funcs, launcher,
-                 resolution=0.01, **kwargs):
+                 resolution=0.01, climber, **kwargs):
         print('RootWalker.__init__()')
         self.setMutables(mutables)
         self.setCostFuncs(cost_funcs)
         self.setLauncher(launcher)
+        self.setRunResolution(resolution)
         self._iterations = 0
         self._total_run_count = 0
-        self.setRunResolution(resolution)
         super(RootWalker, self).__init__(**kwargs)
         self._storeDefaults()
         self._poor_debug_code = 0
